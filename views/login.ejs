@@ -1,0 +1,35 @@
+<%- include('partials/site-header') -%>
+
+     
+<%- include('partials/site-menu') -%>
+      <!-- contact -->
+        <div class="contact">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-12 ">
+                <div class="titlepage text_align_center">
+                  <h2>Log In</h2>
+                </div>
+              </div>
+              <div class="col-md-8 offset-md-2">
+                <form class="main_form" method="POST" action="/users/login">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <input class="form_control" placeholder="Your username" type="text" name="username"> 
+                    </div>
+                    <div class="col-md-12">
+                      <input class="form_control" placeholder="Your Password" type="password" name="password">
+                    </div>
+                    <div class="col-md-12">
+                      <div class="group_form">
+                        <button class="send_btn" type="submit">Log In</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <!-- end contact -->
+      <%- include('partials/site-footer.ejs') -%>
