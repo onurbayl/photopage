@@ -4,6 +4,8 @@ import mongoose from "mongoose"
 import main from "./routes/main.js"
 import photos from "./routes/photos.js"
 import users from "./routes/users.js"
+import cookieParser from "cookie-parser"
+import {checkUser} from "./middlewares/authMiddleware.js"
 
 dotenv.config();
 const app = express();
@@ -14,10 +16,12 @@ mongoose.connect(`mongodb://127.0.0.1/photopage`);
 app.use(express.static('public'));
 app.use(express.json()); //json parser
 app.use(express.urlencoded({extended:true})) //form body parser
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); //template engine
+app.use(cookieParser()) //cookie-parser
 
 const port = process.env.PORT;
 
+app.use('*', checkUser);
 app.use('/', main);
 app.use('/photos', photos);
 app.use('/users', users);
