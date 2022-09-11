@@ -6,8 +6,18 @@ import photos from "./routes/photos.js"
 import users from "./routes/users.js"
 import cookieParser from "cookie-parser"
 import {checkUser} from "./middlewares/authMiddleware.js"
+import {v2 as cloudinary} from "cloudinary";
+import fileUpload from "express-fileupload";
+import methodOverride from "method-override";
 
 dotenv.config();
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+})
+
+
 const app = express();
 
 //database connection
@@ -18,6 +28,8 @@ app.use(express.json()); //json parser
 app.use(express.urlencoded({extended:true})) //form body parser
 app.set('view engine', 'ejs'); //template engine
 app.use(cookieParser()) //cookie-parser
+app.use(fileUpload({useTempFiles: true})) //express-fileupload
+app.use(methodOverride('_method', { methods: ['POST','GET']})); //method override
 
 const port = process.env.PORT;
 
