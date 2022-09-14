@@ -49,10 +49,46 @@ const getAllPhotos = async (req, res) => {
 const getAPhoto = async (req, res) => {
     try {
         const photo = await Photo.findOne({_id: req.params.id}).populate('user');
-        res.status(200).render('photo', {photo, link: 'photos'})
+        const visitor = res.locals.user;
+        res.status(200).render('photo', {photo, link: 'photos', visitor});
     } catch (error) {
         res.status(500).send('Error');
     }
 }
 
-export {createPhoto, getAllPhotos, getAPhoto}
+const deleteAPhoto = async (req, res) => {
+    try {
+        const photo = await Photo.findOne({_id: req.params.id});
+        if(res.locals.user._id.toString() !== photo.user.toString()){
+            return res.redirect('/users/dashboard');
+        }
+        await cloudinary.uploader.destroy(photo.public_id);
+        await Photo.findOneAndDelete({_id: req.params.id});
+        res.status(200).redirect('/photos');
+    } catch (error) {
+        res.status(500).send('Photo delete error');
+    }
+}
+
+const updatePhoto = async (req, res) => {
+    try {
+        const photo = await Photo.findOne({_id:req.params.id});
+        if(req.files){
+            await cloudinary.uploader.destroy(photo.public_id);
+            const result = await cloudinary.uploader.upload(req.files.image.tempFilePath,
+                {
+                    unique_filename: true,
+                    folder:'photopage'
+                }
+            );
+            await Photo.findOneAndUpdate({_id: req.params.id}, {$set:{link: result.secure_url, public_id: result.public_id}});
+            fs.unlinkSync(req.files.image.tempFilePath);
+        }
+        await Photo.findOneAndUpdate({_id: req.params.id}, {$set:{name:req.body.name, description:req.body.description}});
+        res.status(200).redirect('back');
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export {createPhoto, getAllPhotos, getAPhoto, deleteAPhoto, updatePhoto}
